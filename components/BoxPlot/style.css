@@ -1,0 +1,45 @@
+		:root {
+			--var-color-grey: #898989;
+		}
+
+		body {
+			margin: 0;
+			font-family: Helvetica;
+			;
+		}
+
+		text {
+			font-family: Helvetica;
+			color: var(--var-color-grey);
+			font-size: 1.2em;
+		}
+
+		.y.axis path,
+		.y.axis line {
+			fill: none;
+			stroke: var(--var-color-grey);
+			shape-rendering: crispEdges;
+		}
+
+		.x.axis path,
+		.x.axis line,
+		.grid path {
+			stroke-width: 0;
+		}
+
+		.tick line {
+			stroke: lightgrey;
+			opacity: 0.6;
+			stroke-dasharray: 2, 1;
+			stroke-width: 1;
+			shape-rendering: crispEdges;
+		}
+
+		.d3-tip {
+			line-height: 1;
+			padding: 6px;
+			background: rgba(0, 0, 0, 0.7);
+			color: #fff;
+			border-radius: 4px;
+			font-size: 12px;
+		}
