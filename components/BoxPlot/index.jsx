@@ -1,43 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { union } from "lodash";
 import * as d3 from "d3";
 
+import { getLightBackground, getMinMax } from "./utils";
+
 import "./style.css";
-
-/**
- * 1. MMSharedData.lightTheme ?
- * 2. getData data is doing funky stuff. Shouldn't have such unreasonable data structure TODO: sit with Jacob
- */
-
-/**
- * UTILS
- */
-
-const getLightBackground = n => {
-  const col = [
-    "#666666",
-    "#00cccc",
-    "#009999",
-    "#cc3399",
-    "#990066",
-    "#3399cc",
-    "#0066cc",
-    "#99cc33",
-    "#339966",
-    "#ffcc33",
-    "#ff6600",
-    "#33ffcc",
-    "#ff6699",
-    "#33ccff",
-    "#33cc66",
-    "#ff9900",
-    "#996699",
-    "#660066",
-    "#336699",
-    "#003399"
-  ];
-  return col[n % col.length];
-};
 
 export default ({
   data: { xAxis = {}, yAxis = {}, series = {} },
@@ -69,18 +35,10 @@ export default ({
   const medianLineColor = "#ffffff";
   const axisColor = "#898989";
 
-  const getMinMax = () => {
-    const unique = union(...Object.values(series).map(s => s.values));
-    return {
-      min: Math.min(...unique),
-      max: Math.max(...unique)
-    };
-  };
-
-  const { min, max } = getMinMax();
+  const { min, max } = getMinMax(series);
   const seriesNames = Object.keys(series);
 
-  const getThemeStyles = themeName => {
+  const getThemeStyles = (themeName = "dark") => {
     switch (themeName) {
       case "light":
         return `
@@ -297,22 +255,13 @@ export default ({
       .append("g")
       .attr("class", "y axis")
       .attr("transform", `translate(${margin.left + 30}, ${margin.top})`)
-      .call(yAxis)
-      .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .style("text-anchor", "end")
-      .text(yAxis.label);
+      .call(yAxis);
 
     const xAxis = d3.axisBottom(xScale);
     xAxisBox
       .append("g")
       .attr("class", "x axis")
-      .attr(
-        "transform",
-        `translate(${margin.left + 30}, ${height - margin.bottom})`
-      )
+      .attr("transform", `translate(${margin.left + 42.5}, ${height - 20})`)
       .call(xAxis);
   }, []);
 
