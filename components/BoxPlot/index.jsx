@@ -1,7 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import { getLightBackground, getMinMax } from "./utils";
+import {
+  getXLabelsInclination,
+  getInterquartileRange,
+  getThemeStyles,
+  createPlotData,
+  boxQuartiles,
+  getMinMax,
+  sortNumbersBySize
+} from "./utils";
+
+import uiOptions from "./options";
 
 import "./style.css";
 
@@ -16,89 +26,21 @@ export default ({
 }) => {
   const d3Container = useRef(null);
 
-  const getXLabelsInclination = xAxis => {
-    const { labelsInclination } = xAxis;
-    return labelsInclination === undefined ? -45 : labelsInclination;
-  };
-
-  const margin = {
-    top: 10,
-    right: 10,
-    bottom: getXLabelsInclination(xAxis) ? 40 : 10,
-    left: 20
-  };
-
-  const width = svgWidth - margin.left - margin.right;
-  const height = svgHeight - margin.top - margin.bottom;
-  const barWidth = 40;
-  const boxPlotColor = "#898989";
-  const medianLineColor = "#ffffff";
-  const axisColor = "#898989";
+  const {
+    margin,
+    width,
+    height,
+    barWidth,
+    boxPlotColor,
+    medianLineColor,
+    axisColor
+  } = uiOptions({ xAxis, svgWidth, svgHeight });
 
   const { min, max } = getMinMax(series);
   const seriesNames = Object.keys(series);
 
-  const getThemeStyles = (themeName = "dark") => {
-    switch (themeName) {
-      case "light":
-        return `
-             /* <![CDATA[ */
-            .axis path, .axis line { fill: none; stroke: white; stroke-width: 1; shape-rendering: crispEdges; }
-            .axislabel { font: 12px Arial; fill: white; } 
-            .axis text { fill: white; }
-            .yruler, .xruler path, .yruler, .xruler line { fill: none; stroke: #3B4556; stroke-width: 1; shape-rendering: crispEdges; }
-            .titleLabel { fill: white }
-            /* ]]\> */
-            `;
-      case "dark":
-        return `
-            /* <![CDATA[ */
-            .axis path, .axis line { fill: none; stroke: black; stroke-width: 1; shape-rendering: crispEdges; }
-            .axislabel { font: 12px Arial; fill: black; } .axis text { fill: black; }
-            .yruler, .xruler path, .yruler, .xruler line { fill: none; stroke: #E9E4D9; stroke-width: 1; shape-rendering: crispEdges; }
-            .titleLabel { fill: black }
-            /* ]]\> */
-        `;
-    }
-  };
-
-  function boxQuartiles(d) {
-    return [d3.quantile(d, 0.75), d3.quantile(d, 0.5), d3.quantile(d, 0.25)];
-  }
-
-  const getInterquartileRange = k => {
-    return (d, i) => {
-      const q1 = d.quartiles[0],
-        q3 = d.quartiles[2],
-        iqr = (q3 - q1) * k,
-        i = -1,
-        j = d.length;
-      while (d[++i] < q1 - iqr);
-      while (d[--j] > q3 + iqr);
-      return [i, j];
-    };
-  };
-
-  const getData = () => {
-    return seriesNames.map((name, index) => {
-      const { values, color } = series[name];
-
-      return {
-        ...series[name],
-        key: name,
-        color: color || getLightBackground(index),
-        quartile: boxQuartiles(values),
-        whiskers: [
-          yAxis.min || Math.min(...values),
-          yAxis.max || Math.max(...values)
-        ]
-      };
-    });
-  };
-
   useEffect(() => {
-    const plotData = getData();
-
+    const plotData = createPlotData(series, seriesNames, yAxis);
     const svg = d3.select("svg");
 
     svg
@@ -254,14 +196,14 @@ export default ({
     yAxisBox
       .append("g")
       .attr("class", "y axis")
-      .attr("transform", `translate(${margin.left + 30}, ${margin.top})`)
+      .attr("transform", `translate(0, ${margin.top})`)
       .call(yAxis);
 
     const xAxis = d3.axisBottom(xScale);
     xAxisBox
       .append("g")
       .attr("class", "x axis")
-      .attr("transform", `translate(${margin.left + 42.5}, ${height - 20})`)
+      .attr("transform", `translate(0, ${height - 20})`)
       .call(xAxis);
   }, []);
 

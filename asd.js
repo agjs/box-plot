@@ -31,35 +31,6 @@ Ext.define("LSP.view.graphics.BoxPlot", {
 
     if (!svg) return;
 
-    var theme = "cool";
-    if (me.plotData.theme) {
-      theme = me.plotData.theme;
-    } else if (MMSharedData.lightTheme) {
-      theme = "boring";
-    }
-    var cssText = "/* <![CDATA[ */\n";
-    if (theme === "cool") {
-      cssText +=
-        ".axis path, .axis line { fill: none; stroke: white; stroke-width: 1; shape-rendering: crispEdges; }\n";
-      cssText +=
-        ".axislabel { font: 12px Arial; fill: white; } .axis text { fill: white; }\n";
-      cssText +=
-        ".yruler, .xruler path, .yruler, .xruler line { fill: none; stroke: #3B4556; stroke-width: 1; shape-rendering: crispEdges; }\n";
-      cssText += ".titleLabel { fill: white }\n";
-    } else if (theme === "boring") {
-      cssText +=
-        ".axis path, .axis line { fill: none; stroke: black; stroke-width: 1; shape-rendering: crispEdges; }\n";
-      cssText +=
-        ".axislabel { font: 12px Arial; fill: black; } .axis text { fill: black; }\n";
-      cssText +=
-        ".yruler, .xruler path, .yruler, .xruler line { fill: none; stroke: #E9E4D9; stroke-width: 1; shape-rendering: crispEdges; }\n";
-      cssText += ".titleLabel { fill: black }\n";
-    }
-    cssText += "/* ]]> */\n";
-    svg.selectAll("*").remove();
-    svg.attr("xmlns", "http://www.w3.org/2000/svg");
-    svg.append("style").text(cssText);
-
     var labels = false; // show the text labels beside individual boxplots?
 
     var xLabelsInclination =
@@ -85,41 +56,6 @@ Ext.define("LSP.view.graphics.BoxPlot", {
         : Infinity;
     var max = -Infinity;
 
-    // using an array of arrays with
-    // data[n][2]
-    // where n = number of columns in the csv file
-    // data[i][0] = name of the ith column
-    // data[i][1] = array of values of ith column
-
-    var data = [];
-    seriesNames.forEach(function(seriesName, seriesIndex) {
-      var seriesData = me.plotData.series[seriesName]["values"];
-      var seriesColor = me.plotData.series[seriesName]["color"];
-      if (me.plotData.series[seriesName]["bogusValues"])
-        seriesData = Ext.Array.merge(
-          seriesData,
-          me.plotData.series[seriesName]["bogusValues"]
-        );
-      var bogusValues = [];
-      if (me.plotData.series[seriesName]["bogusValues"])
-        bogusValues = me.plotData.series[seriesName]["bogusValues"];
-      data[seriesIndex] = [];
-      data[seriesIndex][0] = seriesName;
-      data[seriesIndex][1] = me.plotData.series[seriesName]["values"];
-      //data[seriesIndex][2] = MMUx.grit42ColorsLightBg(seriesIndex);
-      // TODO handle case of array of colors -one for each point
-      data[seriesIndex][2] =
-        typeof seriesColor === "string"
-          ? seriesColor
-          : MMUx.grit42ColorsLightBg(seriesIndex);
-
-      data[seriesIndex][3] = me.plotData.series[seriesName]["name"];
-      data[seriesIndex][4] = me.plotData.series[seriesName]["details"];
-      data[seriesIndex][5] = bogusValues; // Bogus values
-      seriesData.forEach(function(value) {
- union(...Object.values(series).map(s => s.values))min
-      });
-    });
 
     var whiskers = me.showWhiskers === true ? iqr(1.5) : me.showWhiskers;
     var chart = d3
