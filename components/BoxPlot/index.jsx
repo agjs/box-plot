@@ -7,6 +7,10 @@ import getUIOptions from "./options";
 
 import "./style.css";
 
+/**
+ * Inspired by: https://blockbuilder.org/rlishtaba/23f4ea532ee961f426fd85b1c8043485
+ */
+
 const Box = ({
   data: { xAxis = {}, yAxis = {}, series = {} },
   dimensions: { svgWidth, svgHeight },
