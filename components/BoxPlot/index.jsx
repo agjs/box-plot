@@ -1,21 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
+import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import {
-  getXLabelsInclination,
-  getInterquartileRange,
-  getThemeStyles,
-  createPlotData,
-  boxQuartiles,
-  getMinMax,
-  sortNumbersBySize
-} from "./utils";
-
-import uiOptions from "./options";
+import { getThemeStyles, createPlotData, getMinMax } from "./utils";
+import getUIOptions from "./options";
 
 import "./style.css";
 
-export default ({
+const Box = ({
   data: { xAxis = {}, yAxis = {}, series = {} },
   dimensions: { svgWidth, svgHeight },
   themeName,
@@ -34,7 +26,7 @@ export default ({
     boxPlotColor,
     medianLineColor,
     axisColor
-  } = uiOptions({ xAxis, svgWidth, svgHeight });
+  } = getUIOptions({ xAxis, svgWidth, svgHeight });
 
   const { min, max } = getMinMax(series);
   const seriesNames = Object.keys(series);
@@ -209,3 +201,35 @@ export default ({
 
   return <svg className="box" ref={d3Container} />;
 };
+
+Box.propTypes = {
+  data: PropTypes.shape({
+    xAxis: PropTypes.shape({
+      label: PropTypes.string,
+      labelsInclination: PropTypes.number,
+      type: PropTypes.oneOf(["linear"])
+    }),
+    yAxis: PropTypes.shape({
+      label: PropTypes.string,
+      type: PropTypes.oneOf(["linear"])
+    }),
+    series: PropTypes.shape({
+      dynamicId: PropTypes.shape({
+        values: PropTypes.arrayOf(PropTypes.number),
+        name: PropTypes.string,
+        key: PropTypes.string
+      })
+    })
+  }),
+  dimensions: PropTypes.shape({
+    svgWidth: PropTypes.number,
+    svgHeight: PropTypes.number
+  }),
+  themeName: PropTypes.string,
+  showBox: PropTypes.bool,
+  showMedian: PropTypes.bool,
+  showOutliers: PropTypes.bool,
+  showWhiskers: PropTypes.bool
+};
+
+export default Box;
